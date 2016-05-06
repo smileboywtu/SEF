@@ -1,5 +1,8 @@
 <h2> SEF </h2>
 
+![lisence](https://img.shields.io/hexpm/l/plug.svg)
+![language](https://img.shields.io/badge/python-2.7.10-green.svg)
+
 a symmetry encryption algorithm based on fountain code.
 
 <h2> Feature </h2>
