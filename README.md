@@ -1,100 +1,41 @@
-# SEF
-a symmetry data encryption based on fountain code
+<h2> SEF </h2>
 
-# 算法设计
+a symmetry encryption algorithm based on fountain code.
 
-假设密钥为: PRIMARY_KEY = b7b6...b0
+<h2> feature </h2>
 
-密钥掩码为: MASK = 101
++ PKCS7 padding and depadding
++ symmetry
++ support 8, 16, 32, 64, 128, 256 bits key
 
-加密块为: B7B6B5...B0(共64位)
+<h2> algorithm design </h2> 
 
-# 加密过程
+this algorithm just use the bitwise **xor** to encrypt the message, but it cycle the key, and use a mask to 
+cover the key, so it's really difficute to guess the start encrypt data block without know the key.
 
-**1.** 通过掩码和密钥获得初始key值:
+the complexity grows along with the key bits:
 
-``` c
++ 8 bit key will encrypt a block data of 64 bits 8 turns chained way
++ 16 bit key will encrypt a block data of 64 bits 16 turns chained way
++ 32 bit, 32 turns
++ 64 bit, 64 turns
++ 128 bit, 128 turns
++ 256 bit, 256 turns
 
-// 获得初始
-key = b2b1b0 ^ MASK
+for a block data of 64 bits, the encrypt process start with the source block data on the first turn, but the second turn will base on the preview result. so if one want to decrypt the source data, he or  she need to inverse the process with [8, 16, 32, 64, 128, 256] turns with the exact key [256, 65526, 4294967296, ...]. the complexity grows very fastly.
 
-```
+<h2> encryption </h2> 
 
-**2.** 通过key值获得初始加密块
+encrypt process for a block of data with 8 bit key
 
-``` c
+[!Alt Text](./screen/encrypt.gif)
 
-x0 = B[key++ % 8]
-x1 = x0 ^ B[key++ % 8]
-x2 = x1 ^ B[key++ % 8]
-x3 = x2 ^ B[key++ % 8]
-...
-// 直到
-x7 = x6 ^ B[key % 8]
+<h2> decryption </h2>
 
-```
+decrypt process for a block cliper with 8 bit key
 
-**3.** 得到新的数据模块:
+[!Alt Text](./screen/decrypt.gif)
 
-将得到的x7, x6, x5, x4, ..., x0得到新的B7B6B5...B0
+<h2> author </h2> 
 
-**4.** 获得新的key
-
-``` c
-
-// 循环获得key
-key = b3b2b1 ^ MASK
-
-```
-
-**5.** 通过key值获得初始加密块
-
-``` c
-
-x0 = B[key++ % 8]
-x1 = x0 ^ B[key++ % 8]
-x2 = x1 ^ B[key++ % 8]
-x3 = x2 ^ B[key++ % 8]
-...
-x7 = x6 ^ B[key % 8]
-
-```
-
-**6.** 得到新的数据块
-
-通过x7x6x5...x0获得新的B7B6B5...B0
-
-
-**7.** 重复以上步骤, 直到循环遍历所有的key
-
-...
-
-# 解密过程
-
-
-**1.** 获得key7
-
-``` c
-
-key7 = b1b0b7 ^ MASK
-
-```
-
-**2.** 从第七轮加密数据中获得第六轮的数据
-
-``` c
-
-// 假设 最终的加密数据为 B7B6...B0
-
-x7x6...x0 = B7B6...B0
-
-B[key7] = x0
-B[key7++ % 8] = x1 ^ x0
-B[key7++ % 8] = x2 ^ x1
-...
-B[key7 % 8] = x7 ^ x6
-
-```
-
-# author
 smileboywtu@gmail.com
