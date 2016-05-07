@@ -10,13 +10,10 @@ using pkcs7 padding
 
 import io
 from key import key_generate
-from utils import _block_iter, PKCS7_pad
+from utils import _block_iter, PKCS7_pad, BLOCK_SIZE
 
 
-BLOCK_SIZE = 8L
-
-
-def encrypt(data, key, mask, out=None, bsize=BLOCK_SIZE):
+def encrypt(data, key, mask, out=None, bsize=BLOCK_SIZE, pkcs7=True):
     """encrypt the data with the key and the mask
 
     @params:
@@ -51,15 +48,35 @@ def encrypt(data, key, mask, out=None, bsize=BLOCK_SIZE):
         B = [chr(item) for item in B]
         return bytearray(B)
 
+    # prepare to pad
+    q, r = divmod(len(data), bsize)
+    q = q if r == 0 else q + 1
+
+    # check pkcs7 and block
+    if not pkcs7 and r != 0:
+        raise Exception('pkcs7 is disabled, but given unblocked data')
+
     # prepare the out stream
     if not out:
         out = io.BytesIO()
 
-    for _bytes in _block_iter(data=data, bsize=bsize):
+    for index, _bytes in enumerate(_block_iter(data=data, bsize=bsize)):
         # pad if not enough
-        if len(_bytes) < bsize:
-            _bytes = PKCS7_pad(_bytes, bsize)
+        if index == q - 1:
+            last = PKCS7_pad(_bytes, bsize) if pkcs7 else _bytes            
+            if len(last) > bsize:
+                _bytes = last[bsize:]
+                out.write(_encrypt(last[:bsize]))
+            else:
+                _bytes = last[:]
         # encrypt the bytes
         out.write(_encrypt(_bytes))
 
     return out
+
+
+if __name__ == '__main__':
+
+    out = io.BytesIO()
+
+

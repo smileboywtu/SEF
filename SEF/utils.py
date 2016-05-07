@@ -5,30 +5,43 @@
 this module is the utils for the encrypt and decrypt process
 
 """
+
 import io
 import binascii
 import StringIO
 
 
-def PKCS7_pad(block, key):
-    """pkcs 7 padding"""
-    l = len(block)
+BLOCK_SIZE = 8L
+
+
+def PKCS7_pad(block, bsize):
+    """pkcs 7 padding
+
+    always pad the block even the block is full
+    """
+    size_ = len(block)
     output = StringIO.StringIO()
-    val = key - (l % key)
-    for _ in xrange(val):
-        output.write('%02x' % val)
+    val = bsize - (size_ % bsize)
+    if val == 0:
+        output.write('{:02x}'.format(bsize) * bsize)
+    else:
+        output.write('{:02x}'.format(val) * val)
     return block + binascii.unhexlify(output.getvalue())
 
 
-def PKCS7_depad(block, key):
-    """pkcs 7 depadding"""
-    nl = len(block)
-    val = int(binascii.hexlify(block[-1]), 16)
-    if val > key:
-        raise ValueError('Input is not padded or padding is corrupt')
+def PKCS7_depad(block, bsize):
+    """pkcs 7 depadding
 
-    l = nl - val
-    return block[:l]
+    make sure the block if full of the bsize
+    """
+    if len(block) != bsize:
+        raise ValueError("block size if not equal to require size")
+    val = int(binascii.hexlify(block[-1]), 16)
+    # not pad
+    if val > bsize:
+        return block
+    end = bsize - val
+    return block[:end]
 
 
 def _block_iter(stream=None, data=None, bsize=0):
@@ -56,9 +69,14 @@ def _block_iter(stream=None, data=None, bsize=0):
 if __name__ == '__main__':
 
     bsize = 3
-    message = 'hello, my little daughter.'
+    message = 'hello, my little daughte'
     print 'message %s' % message
-    for _bytes in _block_iter(data=message, bsize=bsize):
+    q, r = divmod(len(message), bsize)
+    for index, _bytes in enumerate(_block_iter(data=message, bsize=bsize)):
         if len(_bytes) < bsize:
             _bytes = PKCS7_pad(_bytes, bsize)
+        elif index == q - 1:
+            _bytes = PKCS7_pad(_bytes, bsize)
+            print '%s:  %s' % (_bytes[:bsize], binascii.hexlify(_bytes[:bsize]))
+            _bytes = _bytes[bsize:]
         print '%s:  %s' % (_bytes, binascii.hexlify(_bytes))

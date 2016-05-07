@@ -9,13 +9,10 @@ PKCS7 depad
 
 import io
 from key import key_generate
-from utils import PKCS7_depad, _block_iter
+from utils import PKCS7_depad, _block_iter, BLOCK_SIZE
 
 
-BLOCK_SIZE = 8L
-
-
-def decrypt(cliper, key, mask, out=None, bsize=BLOCK_SIZE):
+def decrypt(cliper, key, mask, out=None, bsize=BLOCK_SIZE, pkcs7=True):
     """decrypt the cliper with key a bsize
 
     @params:
@@ -56,7 +53,7 @@ def decrypt(cliper, key, mask, out=None, bsize=BLOCK_SIZE):
         data = _decrypt(_bytes, key, mask)
         # if the last block, depad
         if index == q - 1:
-            data = PKCS7_depad(data, bsize)
+            data = PKCS7_depad(data, bsize) if pkcs7 else data
         # write to output stream
         out.write(data)
 

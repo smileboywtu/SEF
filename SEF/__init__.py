@@ -1,5 +1,5 @@
 __version__ = '1.0'
-__author__ = 'smileboywtu'
 
+from .utils import BLOCK_SIZE
 from .encrypt import encrypt
 from .decrypt import decrypt
