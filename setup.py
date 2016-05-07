@@ -11,5 +11,5 @@ setup(
     author='smileboywtu',
     author_email='smileboywtu@gmail.com',
     url='https://github.com/smileboywtu/SEF',
-    lisence='Apache2'
+    license='Apache2'
 )
