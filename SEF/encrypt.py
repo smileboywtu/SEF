@@ -59,15 +59,7 @@ def encrypt(data, key, mask, out=None, bsize=BLOCK_SIZE):
         # pad if not enough
         if len(_bytes) < bsize:
             _bytes = PKCS7_pad(_bytes, bsize)
-
         # encrypt the bytes
         out.write(_encrypt(_bytes))
 
     return out
-
-
-if __name__ == '__main__':
-
-    out = io.BytesIO()
-
-
