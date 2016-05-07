@@ -39,6 +39,17 @@ decrypt process for a block cliper with 8 bit key
 
 ![Alt Text](./screen/decrypt.gif)
 
+<h2> Tester </h2>
+
+requirements:
+
++ gnuplot
+
+current tester:
+
++ key bits length tester
++ message length tester
+
 <h2> Author </h2> 
 
 smileboywtu@gmail.com
