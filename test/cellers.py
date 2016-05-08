@@ -126,6 +126,9 @@ def AES_celler(message, key, *args):
 
 if __name__ == '__main__':
 
+	global debug
+	debug = 1
+	
 	from utils import generate_message
 
 	message = generate_message(78)

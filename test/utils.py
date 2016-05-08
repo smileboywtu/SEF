@@ -27,6 +27,20 @@ def save_data(x, y, file):
 			fp.write(fmt.format(a, b))	
 
 
+def read_data(file):
+	"""read the data tuple back
+
+	"""
+	x, y = [], []
+	with open(file, 'rt') as fp:
+		for line in fp:
+			x_, y_ = line.split()
+			x.append(int(x_))
+			y.append(float(y_))
+
+	return x, y
+
+
 def length_generator(val):
 	"""generate length for message
 	
@@ -47,7 +61,7 @@ def generate_message(length):
 	items = string.digits + string.letters
 	return ''.join([random.choice(items) for i in xrange(length)])
 
-	
+
 def humanize_bytes(bytes, precision=1):
     """Return a humanized string representation of a number of bytes.
 

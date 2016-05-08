@@ -18,7 +18,7 @@ from utils import (
 	humanize_bytes, save_data
 )
 from cellers import (
-	SEF_celler
+	SEF_celler, DES_celler, DES3_celler, AES_celler
 )
 
 # patch for Colors
@@ -113,7 +113,7 @@ def test_keys():
 		'key/bits', 'time/s'
 	)
 	print '-' * 80
-	save_data(key_types, deltas, 'key_bits.dat')
+	save_data(key_types, deltas, 'KEY.dat')
 
 
 def test_message():
@@ -159,7 +159,58 @@ def test_message():
 		'message/bytes', 'time/s', 
 	)
 	print '-' * 80
-	save_data(lens, deltas, 'message_len.dat')
+	save_data(lens, deltas, 'SEF.dat')
+
+
+def test_general():
+	"""run message length test for AES, DES, DES3"""
+	files = 'DES.dat', 'DES3.dat', 'AES.dat'
+	cellers = DES_celler, DES3_celler, AES_celler
+
+	print (
+		"Key Size: 128\n"
+		"Cellers: {0}"
+	).format(('DES', 'DES3', 'AES'))
+
+	key = Key.random_key(128)[:16]
+	print Colors.colorize('key: ', 'cyan', 'black', 'bold'), key
+
+	turns = 13
+	print Colors.colorize('test turns: ', 'cyan', 'black', 'bold'), turns
+	print '-' * 80
+
+	for index, celler in enumerate(cellers):
+		lens = []
+		deltas = []
+		key_ = key[:8] if index == 0 else key
+		cell = files[index].split('.')[0]
+		print Colors.colorize('run test for ' + cell, 'cyan', 'black', 'bold')
+		print '-' * 80
+
+		print Colors.colorize('Tester Result: ', 'cyan', 'black', 'bold')
+		print ('{:>15}' * 3).format('message len', 'status', 'runtime(s)') 
+		print ''
+		for length in length_generator(turns):
+			lens.append(length)
+			message = generate_message(length)
+			start = time.clock()
+			ret = celler(message, key_)
+			stop = time.clock()
+			delta = stop - start
+			deltas.append(delta)
+			status = 'success' if ret else 'fail'
+			print ('{:>15}' * 3).format(humanize_bytes(length), status, delta)
+
+		print '-' * 80
+		print Colors.colorize('Time Consuming Growing: ', 'cyan', 'black', 'bold')
+		gnuplot(
+			'message growing', 
+			lens, deltas, 
+			lens[-1], deltas[-1], 
+			'message/bytes', 'time/s', 
+		)
+		print '-' * 80
+		save_data(lens, deltas, files[index])
 
 
 def test_suit():
@@ -178,3 +229,10 @@ def test_suit():
 	print Colors.colorize('run message length tester', 'blue', 'white', 'bold')
 	print '-' * 80
 	test_message()
+
+	print Colors.colorize('run general cipher tester', 'blue', 'white', 'bold')
+	print '-' * 80
+	test_general()
+
+	print Colors.colorize('run key test for DES3', 'blue', 'white', 'bold')
+	print '-' * 80

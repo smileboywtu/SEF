@@ -15,7 +15,8 @@ import os
 import sys
 import argparse
 from test import test_suit
-from SEF import encrypt, decrypt
+from plot import show
+from SEF import Sef 
 
 
 def get_parser():
@@ -32,6 +33,7 @@ def get_parser():
     parser.add_argument('--key', metavar='key', help='encrypt or decrypt key')
     parser.add_argument('--mask', metavar='mask', type=int, help='key mask value less than 8')
     parser.add_argument('--test', action='store_true', help='run test for SEF')
+    parser.add_argument('--plot', action='store_true', help='show all the result in same plot')
 
     return parser
 
@@ -76,6 +78,9 @@ def main():
 
     if args['test']:
         test_suit()
+
+    if args['plot']:
+        show()
 
     # get the key
     key = args['key']
