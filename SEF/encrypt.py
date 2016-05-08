@@ -51,7 +51,6 @@ def encrypt(data, key, mask, out=None, bsize=BLOCK_SIZE, pkcs7=True):
     # prepare to pad
     q, r = divmod(len(data), bsize)
     q = q if r == 0 else q + 1
-
     # check pkcs7 and block
     if not pkcs7 and r != 0:
         raise Exception('pkcs7 is disabled, but given unblocked data')

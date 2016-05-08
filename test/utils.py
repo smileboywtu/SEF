@@ -9,6 +9,8 @@ utils for test the sef module
 
 import os
 import time
+import random
+import string
 import hashlib
 
 
@@ -25,6 +27,27 @@ def save_data(x, y, file):
 			fp.write(fmt.format(a, b))	
 
 
+def length_generator(val):
+	"""generate length for message
+	
+	start from  pow(2, 5) till to pow(2, 5+val)
+
+	"""
+	base = 2
+	point = 5 
+	for _ in xrange(val):
+		yield pow(2, point)
+		point += 1
+
+
+def generate_message(length):
+	"""generate random message with given length
+
+	"""
+	items = string.digits + string.letters
+	return ''.join([random.choice(items) for i in xrange(length)])
+
+	
 def humanize_bytes(bytes, precision=1):
     """Return a humanized string representation of a number of bytes.
 

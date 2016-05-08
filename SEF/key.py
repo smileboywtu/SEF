@@ -6,10 +6,36 @@ how to generate the key
 
 """
 
+import os
+import hashlib
 import itertools
 
 
 SUPPORT_KEY_TYPE = 8, 16, 32, 64, 128, 256
+
+
+def generate_key(type, message):
+    """generate the key type with message
+
+    """
+    if type not in SUPPORT_KEY_TYPE:
+        raise ValueError('key type not supported')
+
+    seed = hashlib.sha512(message).hexdigest()
+    q, r = divmod(type, 8)
+    return seed[:q*2]
+
+
+def random_key(type):
+    """generate random key for usage
+
+    must be supported type
+    """
+    if type not in SUPPORT_KEY_TYPE:
+        raise ValueError('key type not supported')
+
+    q, r = divmod(type, 8)
+    return os.urandom(q).encode('hex')
 
 
 def key_check(key):

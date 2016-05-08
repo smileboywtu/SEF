@@ -6,16 +6,20 @@
 
 """
 
+import os
 import time
-import random
-import string
 import hashlib
 import subprocess
-from SEF import encrypt
-from SEF import decrypt
+from SEF import Key 
 from pprint import pprint
 from color import Colors
-from utils import humanize_bytes, save_data
+from utils import (
+	length_generator, generate_message,
+	humanize_bytes, save_data
+)
+from cellers import (
+	SEF_celler
+)
 
 # patch for Colors
 def plain(msg, *args):
@@ -80,14 +84,8 @@ def test_keys():
 	print Colors.colorize('key mask: ', 'cyan', 'black', 'bold'), mask
 	print '-' * 80
 
-	seed = hashlib.sha512(message).hexdigest()
 	key_types = 8, 16, 32, 64, 128, 256
-
-	keys = []
-	for type in key_types:
-		q, r = divmod(type, 8)
-		value = seed[:q*2]
-		keys.append((type, value))
+	keys = [(type, Key.generate_key(type, message)) for type in key_types]
 
 	print Colors.colorize('keys: ', 'cyan', 'black', 'bold')
 	pprint(keys)
@@ -99,12 +97,11 @@ def test_keys():
 	deltas = []
 	for type, key in keys:
 		start = time.clock()
-		cliper = encrypt(message, key, mask).getvalue()
-		message_ = decrypt(cliper, key, mask).getvalue()
+		ret = SEF_celler(message, key, mask)
 		stop = time.clock()
 		delta = stop - start
 		deltas.append(delta)
-		status = 'success' if message == message_ else 'fail'
+		status = 'success' if ret else 'fail'
 		print ('{:>15}' * 3).format(type, status, delta)
 
 	print '-' * 80
@@ -119,32 +116,11 @@ def test_keys():
 	save_data(key_types, deltas, 'key_bits.dat')
 
 
-def length_generator(val):
-	"""generate length for message
-	
-	start from  pow(2, 5) till to pow(2, 5+val)
-
-	"""
-	base = 2
-	point = 5 
-	for _ in xrange(val):
-		yield pow(2, point)
-		point += 1
-
-
-def generate_message(length):
-	"""generate random message with given length
-
-	"""
-	items = string.digits + string.letters
-	return ''.join([random.choice(items) for i in xrange(length)])
-
-
 def test_message():
 	"""test for the message length
 
 	"""
-	key = '53d42ffefe5c71be'
+	key = Key.random_key(64)
 	print Colors.colorize('encrypt key: ', 'cyan', 'black', 'bold'), key
 	print '-' * 80
 
@@ -167,12 +143,11 @@ def test_message():
 		message = generate_message(length)
 		# measure time
 		start = time.clock()
-		cliper = encrypt(message, key, mask).getvalue()
-		message_ = decrypt(cliper, key, mask).getvalue()
+		ret = SEF_celler(message, key, mask)
 		stop = time.clock()
 		delta = stop - start
 		deltas.append(delta)
-		status = 'success' if message == message_ else 'fail'
+		status = 'success' if ret else 'fail'
 		print ('{:>15}' * 3).format(humanize_bytes(length), status, delta)
 
 	print '-' * 80
