@@ -44,11 +44,13 @@ decrypt process for a block cliper with 8 bit key
 requirements:
 
 + gnuplot
++ matplotlib
 
 current tester:
 
 + key bits length tester
 + message length tester
++ common symmetric data encryption
 
 <h2> Author </h2> 
 
