@@ -1,0 +1,76 @@
+=======================================	CPU INFORMATION ==================================================
+
+Architecture:          x86_64
+CPU op-mode(s):        32-bit, 64-bit
+Byte Order:            Little Endian
+CPU(s):                4
+On-line CPU(s) list:   0-3
+Thread(s) per core:    2
+Core(s) per socket:    2
+Socket(s):             1
+NUMA node(s):          1
+Vendor ID:             GenuineIntel
+CPU family:            6
+Model:                 42
+Model name:            Intel(R) Core(TM) i3-2377M CPU @ 1.50GHz
+Stepping:              7
+CPU MHz:               1499.941
+CPU max MHz:           1500.0000
+CPU min MHz:           800.0000
+BogoMIPS:              2993.16
+Virtualization:        VT-x
+L1d cache:             32K
+L1i cache:             32K
+L2 cache:              256K
+L3 cache:              3072K
+NUMA node0 CPU(s):     0-3
+Flags:                 fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe syscall nx rdtscp lm constant_tsc arch_perfmon pebs bts rep_good nopl xtopology nonstop_tsc aperfmperf eagerfpu pni pclmulqdq dtes64 monitor ds_cpl vmx est tm2 ssse3 cx16 xtpr pdcm pcid sse4_1 sse4_2 x2apic popcnt tsc_deadline_timer xsave avx lahf_lm arat epb pln pts dtherm tpr_shadow vnmi flexpriority ept vpid xsaveopt
+
+
+=========================================== MEMORY INFOMATION ==============================================
+
+MemTotal:        7949484 kB
+MemFree:         4422640 kB
+MemAvailable:    5579004 kB
+Buffers:           85220 kB
+Cached:          1414368 kB
+SwapCached:            0 kB
+Active:          2333232 kB
+Inactive:         896864 kB
+Active(anon):    1734256 kB
+Inactive(anon):   379792 kB
+Active(file):     598976 kB
+Inactive(file):   517072 kB
+Unevictable:         196 kB
+Mlocked:             196 kB
+SwapTotal:       3932156 kB
+SwapFree:        3932156 kB
+Dirty:               224 kB
+Writeback:             0 kB
+AnonPages:       1730704 kB
+Mapped:           560908 kB
+Shmem:            383548 kB
+Slab:             144704 kB
+SReclaimable:      82292 kB
+SUnreclaim:        62412 kB
+KernelStack:       12000 kB
+PageTables:        59340 kB
+NFS_Unstable:          0 kB
+Bounce:                0 kB
+WritebackTmp:          0 kB
+CommitLimit:     7906896 kB
+Committed_AS:    8328356 kB
+VmallocTotal:   34359738367 kB
+VmallocUsed:           0 kB
+VmallocChunk:          0 kB
+HardwareCorrupted:     0 kB
+AnonHugePages:         0 kB
+CmaTotal:              0 kB
+CmaFree:               0 kB
+HugePages_Total:       0
+HugePages_Free:        0
+HugePages_Rsvd:        0
+HugePages_Surp:        0
+Hugepagesize:       2048 kB
+DirectMap4k:      196536 kB
+DirectMap2M:     7966720 kB

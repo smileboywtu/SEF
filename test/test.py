@@ -15,10 +15,15 @@ from SEF import encrypt
 from SEF import decrypt
 from pprint import pprint
 from color import Colors
-from utils import humanize_bytes
+from utils import humanize_bytes, save_data
+
+# patch for Colors
+def plain(msg, *args):
+	return msg
+Colors.colorize = staticmethod(plain)
 
 
-def gnuplot(x, y, xt, yt, xl, yl):
+def gnuplot(title, x, y, xt, yt, xl, yl, fmt='dumb', output=None):
 	"""draw console plot 
 
 	use the gnuplot
@@ -29,14 +34,19 @@ def gnuplot(x, y, xt, yt, xl, yl):
 	gnuplot = subprocess.Popen(['/usr/bin/gnuplot'], stdin=subprocess.PIPE)
 	shell = gnuplot.stdin.write
 	# set plot
-	shell("set terminal dumb\n")
-	shell("set title 'time growing'\n")
+	shell("set terminal {0}\n".format(fmt))
+	if output:
+		shell("set grid\n")
+		shell("set output '{0}'\n".format(output))
+
+	shell("set key top left\n")
+	shell("set title '{0}'\n".format(title))
 	# draw
 	shell("set xlabel '{0}'\n".format(xl))	
 	shell("set ylabel '{0}'\n".format(yl))
 	shell("set xrange[0:{0}]\n".format(xt * scale))
 	shell("set yrange[0:{0}]\n".format(yt * scale))
-	shell("plot '-' with linespoints\n")
+	shell("plot '-' with linespoints pointtype 5\n")
 	for x_, y_ in zip(x, y):
 		shell('{0} {1}\n'.format(x_, y_))
 	# exit
@@ -84,7 +94,7 @@ def test_keys():
 	print '-' * 80
 
 	print Colors.colorize('Tester Result: ', 'cyan', 'black', 'bold')
-	print ('{:>15}' * 3).format('key', 'status', 'runtime') 
+	print ('{:>15}' * 3).format('key', 'status', 'runtime(s)') 
 	print ''
 	deltas = []
 	for type, key in keys:
@@ -99,8 +109,14 @@ def test_keys():
 
 	print '-' * 80
 	print Colors.colorize('Time Consuming Growing: ', 'cyan', 'black', 'bold')
-	gnuplot(key_types, deltas, key_types[-1], deltas[-1], 'key/bits', 'time/s')
+	gnuplot(
+		'key bits growing', 
+		key_types, deltas, 
+		key_types[-1], deltas[-1], 
+		'key/bits', 'time/s'
+	)
 	print '-' * 80
+	save_data(key_types, deltas, 'key_bits.dat')
 
 
 def length_generator(val):
@@ -141,7 +157,7 @@ def test_message():
 	print '-' * 80
 
 	print Colors.colorize('Tester Result: ', 'cyan', 'black', 'bold')
-	print ('{:>15}' * 3).format('message len', 'status', 'runtime') 
+	print ('{:>15}' * 3).format('message len', 'status', 'runtime(s)') 
 	print ''
 	lens = []
 	deltas = []
@@ -161,8 +177,14 @@ def test_message():
 
 	print '-' * 80
 	print Colors.colorize('Time Consuming Growing: ', 'cyan', 'black', 'bold')
-	gnuplot(lens, deltas, lens[-1], deltas[-1], 'message/bytes', 'time/s')
+	gnuplot(
+		'message growing', 
+		lens, deltas, 
+		lens[-1], deltas[-1], 
+		'message/bytes', 'time/s', 
+	)
 	print '-' * 80
+	save_data(lens, deltas, 'message_len.dat')
 
 
 def test_suit():

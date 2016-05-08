@@ -12,6 +12,19 @@ import time
 import hashlib
 
 
+DIR = 'data'
+
+
+def save_data(x, y, file):
+	"""save the x, y data into the file
+
+	"""
+	with open(os.path.join(DIR, file), 'wt') as fp:
+		fmt = '{0}	{1}\n'
+		for a, b in zip(x, y):
+			fp.write(fmt.format(a, b))	
+
+
 def humanize_bytes(bytes, precision=1):
     """Return a humanized string representation of a number of bytes.
 
