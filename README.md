@@ -39,12 +39,22 @@ decrypt process for a block cliper with 8 bit key
 
 ![Alt Text](./screen/decrypt.gif)
 
+<h2> Install </h2>
+
+``` shell
+
+	python setup.py build_ext
+	python setup.py install
+	
+```
+
 <h2> Tester </h2>
 
 requirements:
 
 + gnuplot
 + matplotlib
++ cython
 
 current tester:
 

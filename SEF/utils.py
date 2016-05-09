@@ -14,6 +14,22 @@ import StringIO
 BLOCK_SIZE = 8L
 
 
+def tester(func1, func2, data, keys):
+    """test the func1 and func2 output for input data and keys
+
+
+    """
+    print 'source: ', data
+    # copy data
+    dcopy1 = (data + ' ')[:-1]
+    dcopy2 = (data + ' ')[:-1]
+    out1 = func1(dcopy1, keys)
+    out2 = func2(dcopy2, keys)
+    print 'func1: ', out1
+    print 'func2: ', out2
+    assert out1 == out2
+
+
 def PKCS7_pad(block, bsize):
     """pkcs 7 padding
 
