@@ -2,6 +2,7 @@
 
 ![lisence](https://img.shields.io/hexpm/l/plug.svg)
 ![language](https://img.shields.io/badge/python-2.7.10-green.svg)
+![dialect](https://img.shields.io/badge/cython-0.24-green.svg)
 
 a symmetry encryption algorithm based on fountain code.
 
