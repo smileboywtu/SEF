@@ -7,12 +7,13 @@
 """
 
 from SEF import PKCS7, Sef, Key
+from utils import save_encrypt
 
 
 debug = False
 
 
-def SEF_celler(message, key, *args):
+def SEF_celler(message, key, *args, **kwargs):
 	"""SEF test celler
 
 	"""
@@ -20,6 +21,7 @@ def SEF_celler(message, key, *args):
 	ksize = Sef.key_size
 
 	mask = args[0]
+	out = kwargs.pop('out', '')
 	if debug:
 		print (
 			"Cipher:	SEF\n" +
@@ -29,15 +31,15 @@ def SEF_celler(message, key, *args):
 		).format(bsize, ksize, mask)
 
 	cipher = Sef(key, mask)
-
 	message_ = cipher.encrypt(message)
-
+	if out:
+		save_encrypt(message_, out)
 	message_ = cipher.decrypt(message_)
 
 	return message == message_
 
 
-def DES_celler(message, key, *args):
+def DES_celler(message, key, *args, **kwargs):
 	"""DES test celler
 
 	block size 8 bytes
@@ -61,13 +63,16 @@ def DES_celler(message, key, *args):
 	# pad the message
 	_message = PKCS7.pad(message, bsize) 
 	cipher = des.encrypt(_message)
+	out = kwargs.pop('out', '')
+	if out:
+		save_encrypt(cipher, out)
 	message_ = des.decrypt(cipher)
 	# depad the message
 	message_ = message_[:-bsize] + PKCS7.depad(message_[-bsize:], bsize)
 	return message == message_
 
 
-def DES3_celler(message, key, *args):
+def DES3_celler(message, key, *args, **kwargs):
 	"""3 DES test celler
 
 	"""
@@ -89,13 +94,16 @@ def DES3_celler(message, key, *args):
 	# pad the message
 	_message = PKCS7.pad(message, bsize) 
 	cipher = des.encrypt(_message)
+	out = kwargs.pop('out', '')
+	if out:
+		save_encrypt(cipher, out)
 	message_ = des.decrypt(cipher)
 	# depad the message
 	message_ = message_[:-bsize] + PKCS7.depad(message_[-bsize:], bsize)
 	return message == message_
 
 
-def AES_celler(message, key, *args):
+def AES_celler(message, key, *args, **kwargs):
 	"""AES test celler
 
 	"""
@@ -117,6 +125,9 @@ def AES_celler(message, key, *args):
 	# pad the message
 	_message = PKCS7.pad(message, bsize)
 	cipher = aes.encrypt(_message)
+	out = kwargs.pop('out', '')
+	if out:
+		save_encrypt(cipher, out)
 	message_ = aes.decrypt(cipher)
 	# depad the message
 	message_ = message_[:-bsize] + PKCS7.depad(message_[-bsize:], bsize)
@@ -126,8 +137,7 @@ def AES_celler(message, key, *args):
 
 if __name__ == '__main__':
 
-	global debug
-	debug = 1
+	debug = False 
 	
 	from utils import generate_message
 

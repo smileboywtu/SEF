@@ -17,28 +17,34 @@ import hashlib
 DIR = 'data'
 
 
-def save_data(x, y, file):
+def save_encrypt(cipher, file):
+	"""write the cipher to file"""
+	with open(file, 'wb') as writer:
+		writer.write(cipher)
+
+def save_data(x, y, ys, file):
 	"""save the x, y data into the file
 
 	"""
 	with open(os.path.join(DIR, file), 'wt') as fp:
-		fmt = '{0}	{1}\n'
-		for a, b in zip(x, y):
-			fp.write(fmt.format(a, b))	
+		fmt = '{0}	{1}	{2}\n'
+		for a, b, c in zip(x, y, ys):
+			fp.write(fmt.format(a, b, c))	
 
 
 def read_data(file):
 	"""read the data tuple back
 
 	"""
-	x, y = [], []
+	x, y, ys = [], [], []
 	with open(file, 'rt') as fp:
 		for line in fp:
-			x_, y_ = line.split()
+			x_, y_, ys_= line.split()
 			x.append(int(x_))
 			y.append(float(y_))
+			ys.append(float(ys_))
 
-	return x, y
+	return x, y, ys
 
 
 def length_generator(val):

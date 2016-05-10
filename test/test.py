@@ -11,8 +11,9 @@ import time
 import hashlib
 import subprocess
 from SEF import Key 
-from pprint import pprint
 from color import Colors
+from curve import Curve
+from pprint import pprint
 from utils import (
 	length_generator, generate_message,
 	humanize_bytes, save_data
@@ -24,7 +25,10 @@ from cellers import (
 # patch for Colors
 def plain(msg, *args):
 	return msg
-Colors.colorize = staticmethod(plain)
+#Colors.colorize = staticmethod(plain)
+
+func, fmt = Curve.linear
+curve = Curve(func, fmt)
 
 
 def gnuplot(title, x, y, xt, yt, xl, yl, fmt='dumb', output=None):
@@ -84,8 +88,8 @@ def test_keys():
 	print Colors.colorize('key mask: ', 'cyan', 'black', 'bold'), mask
 	print '-' * 80
 
-	key_types = 8, 16, 32, 64, 128, 256
-	keys = [(type, Key.generate_key(type, message)) for type in key_types]
+	key_types = [i * 8 for i in range(1, 33)]
+	keys = [(type, Key.random_key(type)) for type in key_types]
 
 	print Colors.colorize('keys: ', 'cyan', 'black', 'bold')
 	pprint(keys)
@@ -112,8 +116,12 @@ def test_keys():
 		key_types[-1], deltas[-1], 
 		'key/bits', 'time/s'
 	)
+	print '-' * 80	
+	curve.fit(key_types, deltas)
+	print Colors.colorize('Scipy Curve Fit: ', 'cyan', 'black', 'bold'), curve
 	print '-' * 80
-	save_data(key_types, deltas, 'KEY.dat')
+	_, ys = curve.sample()
+	save_data(key_types, deltas, ys, 'KEY.dat')
 
 
 def test_message():
@@ -159,7 +167,11 @@ def test_message():
 		'message/bytes', 'time/s', 
 	)
 	print '-' * 80
-	save_data(lens, deltas, 'SEF.dat')
+	curve.fit(lens, deltas)
+	print Colors.colorize('Scipy Curve Fit: ', 'cyan', 'black', 'bold'), curve
+	print '-' * 80
+	_, ys = curve.sample()
+	save_data(lens, deltas, ys, 'SEF.dat')
 
 
 def test_general():
@@ -210,7 +222,11 @@ def test_general():
 			'message/bytes', 'time/s', 
 		)
 		print '-' * 80
-		save_data(lens, deltas, files[index])
+		curve.fit(lens, deltas)
+		print Colors.colorize('Scipy Curve Fit: ', 'cyan', 'black', 'bold'), curve
+		print '-' * 80
+		_, ys = curve.sample()
+		save_data(lens, deltas, ys, files[index])
 
 
 def test_suit():
@@ -236,3 +252,32 @@ def test_suit():
 
 	print Colors.colorize('run key test for DES3', 'blue', 'white', 'bold')
 	print '-' * 80
+
+
+def test_binary(dir='binary', odir='encrypt'):
+	"""test for image file"""
+	if not os.path.isdir(dir):
+		raise ValueError('not valid dir')
+
+	print Colors.colorize('Tester for image file, directory: ', 'blue', 'white', 'bold'), dir
+	print '-' * 80
+	key = Key.random_key(64)
+	print Colors.colorize('Keys: ', 'cyan', 'black', 'bold'), key
+	mask = 3
+	print Colors.colorize('Mask: ', 'cyan', 'black', 'bold'), mask 
+
+	for file in os.listdir(dir):
+		print Colors.colorize('current test image: ', 'cyan', 'black', 'bold'), file
+		print '-' * 80
+		data = open(os.path.join(dir, file), 'rb').read()
+		fname = os.path.splitext(file)[0] +'.dat'
+		out = os.path.join(odir, fname)
+		start = time.clock()
+		ret = SEF_celler(data, key, mask, out=out)
+		stop = time.clock()
+		delta = stop - start
+		print Colors.colorize('time: ', 'cyan', 'black', 'bold'), delta
+		print '-' * 80
+		status = 'success' if ret else 'fail'
+		print Colors.colorize('status: ', 'cyan', 'black', 'bold'), status 
+		print '-' * 80

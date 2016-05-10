@@ -10,6 +10,7 @@
 import os
 from utils import read_data
 import matplotlib.pyplot as plt
+import matplotlib.patches as mpatches
 
 
 def show(dir='data'):
@@ -29,16 +30,19 @@ def show(dir='data'):
 	start = 1
 	# read all the data
 	for index, file in enumerate(dirs):
-		x, y = read_data(os.path.join(dir, file))
+		x, y, ys = read_data(os.path.join(dir, file))
 		number = rows + columns + start + index
 		# plot the data	
 		plt.subplot(number)
 		plt.title(file.split('.')[0], color='red')
 		plt.xlabel('message/bytes')
 		plt.ylabel('time/s')
-		plt.plot(x, y, 'bo-')
+		plt.plot(x, y, 'bo-', x, ys, 'r^-')
 
 	# show the image
+	red_patch = mpatches.Patch(color='blue', label='source data')
+	blue_patch = mpatches.Patch(color='red', label='scipy fit func')
+	plt.legend(handles=[red_patch, blue_patch], bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
 	plt.show()
 
 
