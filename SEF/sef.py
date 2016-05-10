@@ -13,6 +13,7 @@ from .decrypt import decrypt
 
 from .key import key_check
 from .key import random_key
+from .key import key_generate
 from .key import generate_key
 
 from .utils import PKCS7_pad
@@ -24,7 +25,7 @@ class Sef:
 
 	# static members
 	block_size = 8L
-	key_size = 8, 16, 32, 64, 128, 256
+	key_size = [i * 8 for i in range(1, 33)]
 
 	def __init__(self, key, mask):
 		"""init the ciphter"""
@@ -38,21 +39,24 @@ class Sef:
 		if not (-1 < mask < 8):
 			raise ValueError('mask must be less than 8')
 
-		self.key = key
-		self.mask = mask
+		self.keys = key_generate(key, mask, reverse=False)
+
+	def get_keys(self, reverse=False):
+		"""return the keys"""
+		return self._keys[::-1] if reverse else self._keys[:]
 
 	def encrypt(self, message):
 		"""encrypt the message with the key and mask
 
 		make sure the key and mask is input
 		"""
-		return encrypt(message, self.key, self.mask).getvalue()
+		return encrypt(message, self.keys[:]).getvalue()
 
 	def decrypt(self, message):
 		"""decrypt the cipher with the key and mask
 
 		"""
-		return decrypt(message, self.key, self.mask).getvalue()
+		return decrypt(message, self.keys[::-1]).getvalue()
 
 
 class Key:

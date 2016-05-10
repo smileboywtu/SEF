@@ -10,11 +10,10 @@ using pkcs7 padding
 
 import io
 from cipher import _encrypt
-from key import key_generate
 from utils import _block_iter, PKCS7_pad, BLOCK_SIZE
 
 
-def encrypt(data, key, mask, out=None, bsize=BLOCK_SIZE, pkcs7=True):
+def encrypt(data, keys, out=None, bsize=BLOCK_SIZE, pkcs7=True):
     """encrypt the data with the key and the mask
 
     @params:
@@ -24,7 +23,8 @@ def encrypt(data, key, mask, out=None, bsize=BLOCK_SIZE, pkcs7=True):
         out -- output stream
         bsize -- encrypt data block size, current is 64 bits
     """
-
+    red_patch = mpatches.Patch(color='red', label='source data')
+    blue_patch = mpatches.Patch(color='blue', label='scipy fit func')
     # prepare to pad
     q, r = divmod(len(data), bsize)
     q = q if r == 0 else q + 1
@@ -35,9 +35,6 @@ def encrypt(data, key, mask, out=None, bsize=BLOCK_SIZE, pkcs7=True):
     # prepare the out stream
     if not out:
         out = io.BytesIO()
-
-    # prepare the keys
-    keys = key_generate(key, mask, reverse=False)
 
     for index, _bytes in enumerate(_block_iter(data=data, bsize=bsize)):
         # pad if not enough

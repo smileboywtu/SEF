@@ -11,18 +11,14 @@ import hashlib
 import itertools
 
 
-SUPPORT_KEY_TYPE = 8, 16, 32, 64, 128, 256
-
-
 def generate_key(type, message):
     """generate the key type with message
 
     """
-    if type not in SUPPORT_KEY_TYPE:
-        raise ValueError('key type not supported')
-
-    seed = hashlib.sha512(message).hexdigest()
     q, r = divmod(type, 8)
+    if q == 0 or q > 32 or r != 0:
+        raise ValueError('key type not supported')
+    seed = hashlib.sha512(message).hexdigest()
     return seed[:q*2]
 
 
@@ -31,11 +27,10 @@ def random_key(type):
 
     must be supported type
     """
-    if type not in SUPPORT_KEY_TYPE:
-        raise ValueError('key type not supported')
-
     q, r = divmod(type, 8)
-    return os.urandom(q).encode('hex')
+    if q == 0 or q > 32 or r != 0:
+        raise ValueError('key type not supported')
+    return os.urandom(512).encode('hex')[:q*2]
 
 
 def key_check(key):
@@ -44,12 +39,18 @@ def key_check(key):
     return true  if in support type false if not
 
     """
+    ksize = len(key) * 4
     if isinstance(key, str):
+        # not hex string
         try:
             int(key, 16)
         except ValueError:
             raise Exception('key not a valid hex str')
-        return len(key) * 4 in SUPPORT_KEY_TYPE
+        # key not accept
+        q, r = divmod(ksize, 8)
+        if q == 0 or q > 32 or r != 0:
+            return False
+        return True
     return False
 
 
@@ -68,8 +69,6 @@ def key_generate(key, mask, reverse=False):
 
     return current key
     """
-
-    key = key.lstrip('0x')
 
     if not isinstance(key, str):
         raise Exception("key only support hex str")
@@ -106,7 +105,7 @@ def key_generate(key, mask, reverse=False):
 
 if __name__ == '__main__':
 
-    key = '33'
+    key = '333333'
     mask = 2
     keys = []
     for item in key_generate(key, mask):
