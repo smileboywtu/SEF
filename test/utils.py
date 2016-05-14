@@ -19,8 +19,11 @@ DIR = 'data'
 
 def save_encrypt(cipher, file):
 	"""write the cipher to file"""
-	with open(file, 'wb') as writer:
-		writer.write(cipher)
+	if isinstance(file, str):
+		with open(file, 'wb') as writer:
+			writer.write(cipher)
+	else:
+		file.write(cipher)
 
 def save_data(x, y, ys, file):
 	"""save the x, y data into the file

@@ -1,0 +1,50 @@
+#!/usr/bin/bash
+
+# script use to compare two file
+# author: smileboywtu
+# time: 2016/5/11
+
+# get diff input file
+if [ "$#" != 2 ]
+then
+    echo 'error: argument error, only allow to compare two files'
+    exit
+fi
+
+# make sure file is valid
+if [ ! -e "$1" ] || [ ! -e "$2" ]
+then
+    echo "file $1 or $2 not exist"
+    exit
+fi
+
+echo ""
+file1=$1
+file2=$2
+
+# start to diff two files
+echo 'start to compare the files: '
+for file in "$@"
+do
+    echo "      $file"
+done
+echo ""
+
+function get_size()
+{
+    echo $(stat -c%s "$1")
+}
+
+# get file size
+fsize1=$(get_size "$file1")
+fsize2=$(get_size "$file2")
+
+echo "file size information:"
+echo "      $1:  $fsize1"
+echo "      $2:  $fsize2"
+echo ""
+
+# compare the file
+echo "compare result: "
+echo ""
+cmp -l "$file1" "$file2" | gawk '{printf "%08X %02X %02X\n", $1-1, strtonum(0$2), strtonum(0$3)}; {sum += 1}; END {print sum}'   

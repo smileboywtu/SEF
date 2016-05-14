@@ -14,10 +14,9 @@
 import os
 import sys
 import argparse
-from SEF import Sef 
 from plot import show
 from test import (
-    test_suit, test_binary
+    test_suit, test_binary, test_zip
 )
 
 
@@ -31,6 +30,7 @@ def get_parser():
     parser.add_argument('--test', action='store_true', help='run test for SEF')
     parser.add_argument('--plot', action='store_true', help='show all the result in same plot')
     parser.add_argument('--binary', action='store_true', help='test for binary file')
+    parser.add_argument('--compress', action='store_true', help='test for compress file')
 
     return parser
 
@@ -54,6 +54,9 @@ def main():
 
     if args['binary']:
         test_binary()
+
+    if args['compress']:
+        test_zip()
 
 
 if __name__ == '__main__':

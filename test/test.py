@@ -6,7 +6,9 @@
 
 """
 
+import io
 import os
+import gzip
 import time
 import hashlib
 import subprocess
@@ -250,9 +252,6 @@ def test_suit():
 	print '-' * 80
 	test_general()
 
-	print Colors.colorize('run key test for DES3', 'blue', 'white', 'bold')
-	print '-' * 80
-
 
 def test_binary(dir='binary', odir='encrypt'):
 	"""test for image file"""
@@ -281,3 +280,53 @@ def test_binary(dir='binary', odir='encrypt'):
 		status = 'success' if ret else 'fail'
 		print Colors.colorize('status: ', 'cyan', 'black', 'bold'), status 
 		print '-' * 80
+
+def test_zip(file='binary/test-video.mp4', odir='zip'):
+	"""test for compressing the file"""
+	if not os.path.isfile(file):
+		raise ValueError('not valid file')
+
+	print Colors.colorize('Compressing Test', 'blue', 'white', 'bold')
+	print '-' * 80
+
+	fsize = os.stat(file).st_size
+	print Colors.colorize('Source File: ', 'blue', 'white', 'bold'), file
+	print '-' * 80
+	print Colors.colorize('File Size(bytes): ', 'blue', 'white', 'bold'), fsize
+	print '-' * 80
+
+	names = 'SEF', 'DES', '3DES', 'AES'
+	cellers = SEF_celler, DES_celler, DES3_celler, AES_celler
+
+	mask = 3
+	key = Key.random_key(128)[:16]
+	message = open(file, 'rb').read()
+	bytebuf = io.BytesIO()
+	cmprbuf = io.BytesIO()
+	#zipfile = gzip.GzipFile(fileobj=cmprbuf, mode='wb')	
+	#zipfile.write(message)
+	#csize = len(cmprbuf.getvalue())
+	#rate = float(csize) / fsize * 100
+	#print Colors.colorize('Source Compress Rate: ', 'cyan', 'black', 'bold'), rate 
+	#print '-' * 80
+	for index, cell in enumerate(cellers):
+		print Colors.colorize('Run Zip Test for ', 'cyan', 'black', 'bold'), names[index]
+		print '-' * 80
+
+		key_ = key[:8] if names[index] == 'DES' else key
+		ret = cell(message, key_, mask, out=bytebuf)
+		if ret:
+			zipfile = gzip.GzipFile(fileobj=cmprbuf, mode='wb')
+			zipfile.write(bytebuf.getvalue())
+			csize = len(cmprbuf.getvalue())
+			rate = float(csize) / fsize * 100
+			print Colors.colorize('rate: ', 'cyan', 'black', 'bold'), rate 
+			print '-' * 80
+		else:
+			print Colors.colorize('test failed.', 'cyan', 'black', 'bold')
+			print '-' * 80
+		# reset the byte buffer
+		bytebuf.truncate(0)
+		bytebuf.seek(0, 0)
+		cmprbuf.truncate(0)
+		cmprbuf.seek(0, 0)
