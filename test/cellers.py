@@ -9,8 +9,21 @@
 from SEF import PKCS7, Sef, Key
 from utils import save_encrypt
 
-
 debug = False
+
+
+def sef_encrypt(key, mask, message):
+	"""encrypt message use key and mask
+	"""
+	cipher = Sef(key, mask)
+	return cipher.encrypt(message)
+
+
+def sef_decrypt(key, mask, message):
+	"""decrypt message use key and mask
+	"""
+	cipher = Sef(key, mask)
+	return cipher.decrypt(message)
 
 
 def SEF_celler(message, key, *args, **kwargs):

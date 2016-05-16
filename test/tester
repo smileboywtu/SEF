@@ -16,7 +16,7 @@ import sys
 import argparse
 from plot import show
 from test import (
-    test_suit, test_binary, test_zip
+    test_suit, test_binary, test_zip, test_key_relation
 )
 
 
@@ -27,10 +27,11 @@ def get_parser():
     # create parser
     parser = argparse.ArgumentParser(description='Tester for the SEF(symmtry encryption based on fountain code)')
     # add argument
-    parser.add_argument('--test', action='store_true', help='run test for SEF')
-    parser.add_argument('--plot', action='store_true', help='show all the result in same plot')
-    parser.add_argument('--binary', action='store_true', help='test for binary file')
-    parser.add_argument('--compress', action='store_true', help='test for compress file')
+    parser.add_argument('--test', '-a', action='store_true', help='run test for SEF')
+    parser.add_argument('--plot', '-p', action='store_true', help='show all the result in same plot')
+    parser.add_argument('--binary', '-b', action='store_true', help='test for binary file')
+    parser.add_argument('--compress', '-c', action='store_true', help='test for compress file')
+    parser.add_argument('--snow-breakdown', '-s', dest='snow', action='store_true', help='test snow breakdown effect')
 
     return parser
 
@@ -48,15 +49,14 @@ def main():
 
     if args['test']:
         test_suit()
-
     if args['plot']:
         show()
-
     if args['binary']:
         test_binary()
-
     if args['compress']:
         test_zip()
+    if args['snow']:
+        test_key_relation()
 
 
 if __name__ == '__main__':

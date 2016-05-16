@@ -18,16 +18,18 @@ from curve import Curve
 from pprint import pprint
 from utils import (
 	length_generator, generate_message,
-	humanize_bytes, save_data
+	humanize_bytes, save_data, segment_greeting,
+	random_key_bits
 )
 from cellers import (
-	SEF_celler, DES_celler, DES3_celler, AES_celler
+	SEF_celler, DES_celler, DES3_celler, AES_celler,
+	sef_encrypt, sef_decrypt
 )
 
 # patch for Colors
 def plain(msg, *args):
 	return msg
-#Colors.colorize = staticmethod(plain)
+Colors.colorize = staticmethod(plain)
 
 func, fmt = Curve.linear
 curve = Curve(func, fmt)
@@ -71,6 +73,8 @@ def test_keys():
 	"""test same message for different length key
 
 	"""
+	segment_greeting(greet="SEF Key Test")
+
 	message = (
 		"Python was conceived in the late 1980s,[30] and its implementation "
 		"began in December 1989[31] by Guido van Rossum at Centrum Wiskunde & "
@@ -84,21 +88,19 @@ def test_keys():
 
 	print Colors.colorize('message source: ', 'cyan', 'black', 'bold')
 	pprint(message)
-	print '-' * 80
 
 	mask = 0x03
 	print Colors.colorize('key mask: ', 'cyan', 'black', 'bold'), mask
-	print '-' * 80
 
 	key_types = [i * 8 for i in range(1, 33)]
 	keys = [(type, Key.random_key(type)) for type in key_types]
 
 	print Colors.colorize('keys: ', 'cyan', 'black', 'bold')
 	pprint(keys)
-	print '-' * 80
 
 	print Colors.colorize('Tester Result: ', 'cyan', 'black', 'bold')
 	print ('{:>15}' * 3).format('key', 'status', 'runtime(s)') 
+	print '-' * 80
 	print ''
 	deltas = []
 	for type, key in keys:
@@ -118,32 +120,31 @@ def test_keys():
 		key_types[-1], deltas[-1], 
 		'key/bits', 'time/s'
 	)
-	print '-' * 80	
 	curve.fit(key_types, deltas)
 	print Colors.colorize('Scipy Curve Fit: ', 'cyan', 'black', 'bold'), curve
-	print '-' * 80
 	_, ys = curve.sample()
 	save_data(key_types, deltas, ys, 'KEY.dat')
+	print ''
 
 
 def test_message():
 	"""test for the message length
 
 	"""
+	segment_greeting(greet="SEF Message Length Test")
+
 	key = Key.random_key(64)
 	print Colors.colorize('encrypt key: ', 'cyan', 'black', 'bold'), key
-	print '-' * 80
 
 	mask = 5
 	print Colors.colorize('mask: ', 'cyan', 'black', 'bold'), mask
-	print '-' * 80
 
 	turns = 13
 	print Colors.colorize('test turns: ', 'cyan', 'black', 'bold'), turns
-	print '-' * 80
 
 	print Colors.colorize('Tester Result: ', 'cyan', 'black', 'bold')
 	print ('{:>15}' * 3).format('message len', 'status', 'runtime(s)') 
+	print '-' * 80
 	print ''
 	lens = []
 	deltas = []
@@ -168,16 +169,17 @@ def test_message():
 		lens[-1], deltas[-1], 
 		'message/bytes', 'time/s', 
 	)
-	print '-' * 80
 	curve.fit(lens, deltas)
 	print Colors.colorize('Scipy Curve Fit: ', 'cyan', 'black', 'bold'), curve
-	print '-' * 80
 	_, ys = curve.sample()
 	save_data(lens, deltas, ys, 'SEF.dat')
+	print ''
 
 
 def test_general():
 	"""run message length test for AES, DES, DES3"""
+	segment_greeting(greet="General Encryption Test")
+
 	files = 'DES.dat', 'DES3.dat', 'AES.dat'
 	cellers = DES_celler, DES3_celler, AES_celler
 
@@ -191,7 +193,6 @@ def test_general():
 
 	turns = 13
 	print Colors.colorize('test turns: ', 'cyan', 'black', 'bold'), turns
-	print '-' * 80
 
 	for index, celler in enumerate(cellers):
 		lens = []
@@ -223,12 +224,11 @@ def test_general():
 			lens[-1], deltas[-1], 
 			'message/bytes', 'time/s', 
 		)
-		print '-' * 80
 		curve.fit(lens, deltas)
 		print Colors.colorize('Scipy Curve Fit: ', 'cyan', 'black', 'bold'), curve
-		print '-' * 80
 		_, ys = curve.sample()
 		save_data(lens, deltas, ys, files[index])
+		print ''
 
 
 def test_suit():
@@ -239,22 +239,15 @@ def test_suit():
 		1. key bits test
 		2. file large test
 	"""
-
-	print Colors.colorize('run key bits tester', 'blue', 'white', 'bold')
-	print '-' * 80
 	test_keys()
-
-	print Colors.colorize('run message length tester', 'blue', 'white', 'bold')
-	print '-' * 80
 	test_message()
-
-	print Colors.colorize('run general cipher tester', 'blue', 'white', 'bold')
-	print '-' * 80
 	test_general()
 
 
 def test_binary(dir='binary', odir='encrypt'):
 	"""test for image file"""
+	segment_greeting(greet="SEF File Format Test")
+
 	if not os.path.isdir(dir):
 		raise ValueError('not valid dir')
 
@@ -276,24 +269,22 @@ def test_binary(dir='binary', odir='encrypt'):
 		stop = time.clock()
 		delta = stop - start
 		print Colors.colorize('time: ', 'cyan', 'black', 'bold'), delta
-		print '-' * 80
 		status = 'success' if ret else 'fail'
 		print Colors.colorize('status: ', 'cyan', 'black', 'bold'), status 
-		print '-' * 80
+		print ''
 
 def test_zip(file='binary/test-video.mp4', odir='zip'):
 	"""test for compressing the file"""
+	segment_greeting(greet="SEF Zip Test")
+
 	if not os.path.isfile(file):
 		raise ValueError('not valid file')
 
 	print Colors.colorize('Compressing Test', 'blue', 'white', 'bold')
-	print '-' * 80
 
 	fsize = os.stat(file).st_size
 	print Colors.colorize('Source File: ', 'blue', 'white', 'bold'), file
-	print '-' * 80
 	print Colors.colorize('File Size(bytes): ', 'blue', 'white', 'bold'), fsize
-	print '-' * 80
 
 	names = 'SEF', 'DES', '3DES', 'AES'
 	cellers = SEF_celler, DES_celler, DES3_celler, AES_celler
@@ -321,12 +312,59 @@ def test_zip(file='binary/test-video.mp4', odir='zip'):
 			csize = len(cmprbuf.getvalue())
 			rate = float(csize) / fsize * 100
 			print Colors.colorize('rate: ', 'cyan', 'black', 'bold'), rate 
-			print '-' * 80
 		else:
 			print Colors.colorize('test failed.', 'cyan', 'black', 'bold')
-			print '-' * 80
 		# reset the byte buffer
 		bytebuf.truncate(0)
 		bytebuf.seek(0, 0)
 		cmprbuf.truncate(0)
 		cmprbuf.seek(0, 0)
+
+
+def test_key_relation():
+	"""test the key relation with cipher
+
+	test times : 3
+	"""
+	segment_greeting(greet='SEF Key & Cipher')
+
+	mask = 5
+	print Colors.colorize('Mask: ', 'cyan', 'black', 'bold'), mask
+
+	times = 3
+	key = Key.random_key(256) 
+	keys = [key[16 * time : 16 * (time + 1)] for time in range(times)]
+	print Colors.colorize('Keys: ', 'cyan', 'black', 'bold')
+	pprint(keys)
+
+	message = generate_message(1024)
+	msize = len(message)
+	print Colors.colorize('Message Size: ', 'cyan', 'black', 'bold'), msize
+	print Colors.colorize('Message: ', 'cyan', 'black', 'bold')
+	pprint(message)
+	print ''
+
+	for key in keys:
+		key_ = random_key_bits(key)
+		print Colors.colorize('Key: ', 'cyan', 'black', 'bold'), key
+		print Colors.colorize('ALT: ', 'cyan', 'black', 'bold'), key_
+		print '-' * 80
+
+		message1 = sef_encrypt(key, mask, message)	
+		message2 = sef_encrypt(key_, mask, message)	
+
+		if len(message2) != len(message1):
+			raise Exception('encryption error')
+
+		counter = 0
+		csize = len(message1)
+		for index, letter in enumerate(message1):
+			if message1[index] != message2[index]:
+				counter += 1
+
+		rate = counter * 0.1 / csize * 100
+		print Colors.colorize('Change Rate: ', 'cyan', 'black', 'bold'), '%.3f %%' % rate
+		print ''
+
+
+

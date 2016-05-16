@@ -13,7 +13,6 @@ import random
 import string
 import hashlib
 
-
 DIR = 'data'
 
 
@@ -48,6 +47,22 @@ def read_data(file):
 			ys.append(float(ys_))
 
 	return x, y, ys
+
+
+def random_key_bits(key, bits=1):
+	"""random change the key bits
+	"""
+	key_type = len(key)
+	key_value = int(key, 16)
+	skey = len(bin(key_value).lstrip('0b'))
+	rans = random.sample(xrange(skey - 1), bits)
+	for ran in rans:
+		key_value ^= 1 << ran
+	key_ = hex(key_value).rstrip("L").lstrip("0x")
+	skey = len(key_)
+	for _ in range(key_type - skey):
+		key_ = '0' + key_
+	return key_[:key_type] 
 
 
 def length_generator(val):
@@ -135,6 +150,14 @@ def measure(func, type='cpu'):
 		return ret
 	return wrapper
 
+def segment_greeting(greet):
+	"""show greeting message to user
+
+	"""
+	print '=' * 80
+	print '\t', greet
+	print '=' * 80
+	print ''
 
 def get_fsize(path):
 	"""get the file size
