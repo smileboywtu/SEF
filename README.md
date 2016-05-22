@@ -10,7 +10,7 @@ a symmetry encryption algorithm based on fountain code.
 
 + PKCS7 padding and depadding
 + symmetry
-+ support key bits from zero to 256 that's times of 8
++ support key bits from 8 to - that's times of 8
 
 <h2> Algorithm Design </h2> 
 
