@@ -17,7 +17,10 @@ a symmetry encryption algorithm based on fountain code.
 this algorithm just use the bitwise **xor** to encrypt the message, but it cycle the key, and use a mask to 
 cover the key, so it's really difficute to guess the start encrypt data block without know the key.
 
-for a block data of 64 bits, the encrypt process start with the source block data on the first turn, but the second turn will base on the previous result. so if one want to decrypt the source data, he or  she need to inverse the process with [8, 16, 32, 64, 128, 256] turns with the exact key [256, 65526, 4294967296, ...]. the complexity grows very fastly.
+for a block data of 64 bits, the encrypt process start with the source block data on the first turn, 
+but the second turn will base on the previous result. so if one want to decrypt the source data, 
+he or she need to inverse key sequence used in encryption. start from the last
+turn, use all the inverse key.
 
 for fast encrypting and decrypting data, the main algorithm use the static c
 types.
