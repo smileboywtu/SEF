@@ -10,6 +10,7 @@ import io
 import os
 import gzip
 import time
+import random
 import hashlib
 import subprocess
 from SEF import Key 
@@ -344,11 +345,23 @@ def test_key_relation():
 	pprint(message)
 	print ''
 
-	for key in keys:
+	def unsimilara_rate(item1, item2):
+		"""return rate"""
+		counter = 0
+		csize = len(item1)
+		for index, letter in enumerate(item1):
+			if item1[index] != item2[index]:
+				counter += 1
+
+		rate = counter * 0.1 / csize * 100
+		return rate
+
+
+	def key_relation(key, message):
+		"""test key relation"""
 		key_ = random_key_bits(key)
 		print Colors.colorize('Key: ', 'cyan', 'black', 'bold'), key
 		print Colors.colorize('ALT: ', 'cyan', 'black', 'bold'), key_
-		print '-' * 80
 
 		message1 = sef_encrypt(key, mask, message)	
 		message2 = sef_encrypt(key_, mask, message)	
@@ -356,15 +369,33 @@ def test_key_relation():
 		if len(message2) != len(message1):
 			raise Exception('encryption error')
 
-		counter = 0
-		csize = len(message1)
-		for index, letter in enumerate(message1):
-			if message1[index] != message2[index]:
-				counter += 1
-
-		rate = counter * 0.1 / csize * 100
+		rate = unsimilara_rate(message1, message2)
 		print Colors.colorize('Change Rate: ', 'cyan', 'black', 'bold'), '%.3f %%' % rate
 		print ''
 
+	def message_relation(key, message):
+		"""test the message relation"""
+		byte = random.randrange(msize)
+		letter = message[byte]
+		message_ = message[:byte] + chr(ord(letter) + 1) + message[byte:]
 
+		print Colors.colorize('MSG: ', 'cyan', 'black', 'bold')
+		pprint(message_)
+		
+		print Colors.colorize('Index: ', 'cyan', 'black', 'bold'), byte
 
+		message1 = sef_encrypt(key, mask, message)	
+		message2 = sef_encrypt(key, mask, message_)	
+
+		if len(message2) != len(message1):
+			raise Exception('encryption error')
+
+		rate = unsimilara_rate(message1, message2)
+		print Colors.colorize('Change Rate: ', 'cyan', 'black', 'bold'), '%.3f %%' % rate
+		print ''
+
+	for key in keys:
+		print '*' * 80
+		key_relation(key, message)
+		print '-' * 80
+		message_relation(key, message)

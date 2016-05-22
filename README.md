@@ -47,6 +47,7 @@ decrypt process for a block cliper with 8 bit key
 
 requirements:
 
++ PyCrypto
 + gnuplot
 + matplotlib
 + cython
@@ -58,6 +59,8 @@ current tester:
 + message length tester
 + common symmetric data encryption
 + binary tester, images, voice, video
++ encrypted data compress test(gzip)
++ snow breakdown test
 
 ``` shell
 
