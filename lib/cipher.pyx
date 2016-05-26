@@ -16,6 +16,8 @@ cpdef _encrypt(unsigned char* data, keys):
 	"""sef encrypt func"""
 
 	# define array and reset it to zero
+	cdef char key
+	cdef int index
 	cdef unsigned char* cipher = <unsigned char*>malloc(dsize)
 	for key in keys:
 		memset(cipher, 0, dsize)
@@ -23,18 +25,20 @@ cpdef _encrypt(unsigned char* data, keys):
 			if index == 0:
 				cipher[index] = data[key]
 			else:
-				cipher[index] = data[key % dsize] ^ cipher[index - 1]	
+				cipher[index] = data[key % dsize] ^ cipher[index - 1]
 			key += 1
 		memcpy(data, cipher, dsize)
 	# free the memory
 	free(cipher)
-	return ''.join([chr(data[index]) for index in range(dsize)]) 
+	return ''.join([chr(data[index]) for index in range(dsize)])
 
 
 cpdef _decrypt(unsigned char* cipher, keys):
 	"""sef decrypt func"""
 
 	# define temp array
+	cdef char key
+	cdef int index
 	cdef unsigned char* temp = <unsigned char*>malloc(dsize)
 	for key in keys:
 		memset(temp, 0, dsize)
@@ -43,7 +47,7 @@ cpdef _decrypt(unsigned char* cipher, keys):
 				temp[key % dsize] = cipher[index]
 			else:
 				temp[(key + index) % dsize] = cipher[index] ^ cipher[index - 1]
-		memcpy(cipher, temp, dsize) 
+		memcpy(cipher, temp, dsize)
     # free the memory
 	free(temp)
 	return ''.join([chr(cipher[index]) for index in range(dsize)])
