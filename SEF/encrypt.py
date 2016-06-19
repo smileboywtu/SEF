@@ -23,8 +23,6 @@ def encrypt(data, keys, out=None, bsize=BLOCK_SIZE, pkcs7=True):
         out -- output stream
         bsize -- encrypt data block size, current is 64 bits
     """
-    red_patch = mpatches.Patch(color='red', label='source data')
-    blue_patch = mpatches.Patch(color='blue', label='scipy fit func')
     # prepare to pad
     q, r = divmod(len(data), bsize)
     q = q if r == 0 else q + 1
